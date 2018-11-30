@@ -1,104 +1,56 @@
-(() => {
-    const title = document.getElementById('title');
+((global) => {
+    //DOM
+    const title = document.getElementById('title');   
     const questionMessage = document.getElementById('questionMessage');
     const start = document.getElementById('start');
     const bottom = document.getElementById('bottom');
-    const answers = [];
-
+    global.subTitle = document.getElementById('subTitle');
+    global.answers = [];
     for(i = 0; i < 4; i++){
         num = i + 1;
         answers.push(document.getElementById('answer'+num));
     }
 
-    const quiz = new QuizClass;
+    //グローバル変数を宣言、初期化
+    global.count = 0; //現在が何問目の出題かをカウント
+    global.correctCount = 0; //正答した回数をカウント
 
-    let count = 0;
-    let correcCount = 0;
+    //QuizClassをインスタンス化
+    global.quiz = new QuizClass;
 
-    const createAnswerButton = (_quizAnswers) => {
-
-        const copiedQuizAnswers = _quizAnswers.slice();
-        const _answerButtons = [];
-
-        copiedQuizAnswers.forEach((element, num) => {
-            let obj = {};
-            obj = document.createElement('button');
-            obj.textContent = element;
-            _answerButtons.push(obj);
-            answers[num].appendChild(obj);
-            obj.addEventListener('click', () => {
-                deleteAnswerButton();
-                screenUpdate();
-                judgeCorrectAnswer(num);
-            });
-        });
-
-        return _answerButtons;
-    };
-
-    const screenUpdate = () => {
-
-        if(count < 10){
-            quiz.setQuizDataIndex = count;
-
-            //文章の更新
-            let countNum = count +1;
-            title.innerHTML = '問題' + countNum;
-            questionMessage.innerHTML = quiz.question;
-
-            //Answerボタンの作成
-            createAnswerButton(quiz.answers);
-
-            count++;
-        }
-        else{
-            //文章の更新
-            title.innerHTML = 'あなたの正答数は' + correcCount + 'です！！';
-            questionMessage.innerHTML = '再度チャレンジしたい場合は以下をクリック！！';
-            let returnButton = document.createElement('button');
-            returnButton.textContent = 'ホームに戻る';
-            returnButton.addEventListener('click', () => {
-                location.href = "index.html";
-            })
-            bottom.appendChild(returnButton);
-
-        }
-
-    }
-
-    const judgeCorrectAnswer = (_num) => {
-        if(quiz.answers[_num] === quiz.correctAnswer){
-            correcCount++;
-        }
-    };
-
-    const deleteAnswerButton = () => {
-        answers.forEach((element) => {
-            while(element.firstChild){
-                element.removeChild(element.firstChild);
-            }
-        })
-    }
-
+    //文章の初期化
     questionMessage.innerHTML = '以下のボタンをクリック';
     title.innerHTML = 'ようこそ';
 
+    //「開始」ボタンを押下したとき
     start.addEventListener('click', () => {
 
+        //クイズを取得した後にページを更新する
+        //取得完了前にページを更新してしまうとクイズインスタンスにクイズデータがセットされる前になので、ページが正常に表示されない
         fetch('https://opentdb.com/api.php?amount=10')
         .then((response) => {
-        console.log('Response Dataを取得しました：', response);
-        return response.json();
+            console.log('Response Dataを取得しました：', response);
+            return response.json();
         })
         .then((quizDataObj) => {
-        console.log('Promise Valueを取得しました：', quizDataObj);
+            console.log('Promise Valueを取得しました：', quizDataObj);
 
-        quiz.setQuizDataObj = quizDataObj;
-        
-        bottom.removeChild(start);
+            //取得したクイズデータをクイズインスタンスにセット
+            quiz.setQuizDataObj = quizDataObj;
 
-        //最初の問題（Index = 0）をセット
-        screenUpdate();
+            //ページを更新
+            screenUpdate();
         })
+        .catch((error) => {
+            console.log('クイズデータの取得に失敗しました：', error);
+            alert('エラーが発生しました');
+        });
+
+        //クイズデータの取得中、その旨を表示する
+        questionMessage.innerHTML = '少々お待ちください';
+        title.innerHTML = '取得中';
+
+        //「開始」ボタンを削除
+        bottom.removeChild(start);
     });
-})();
+})(window);
