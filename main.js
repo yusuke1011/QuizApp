@@ -8,7 +8,7 @@
     global.answers = [];
     for(i = 0; i < 4; i++){
         num = i + 1;
-        answers.push(document.getElementById('answer'+num));
+        answers.push(document.getElementById('answer' + num));
     }
 
     //グローバル変数を宣言、初期化

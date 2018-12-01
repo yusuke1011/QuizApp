@@ -12,7 +12,7 @@ const screenUpdate = () => {
         console.log(`${countNum}問目のクイズデータをセットしました`);
 
         //文章の更新
-        title.innerHTML = `問題${count+1}`;
+        title.innerHTML = `問題${count + 1}`;
         subTitle.innerText = '[ジャンル] ' + quiz.category + '\n'; 
         subTitle.innerText += '[難易度] ' + quiz.difficulty;
         questionMessage.innerHTML = quiz.question;

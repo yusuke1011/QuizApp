@@ -34,8 +34,8 @@ class QuizClass {
         _answers.push(this.quizData.correct_answer);
 
         //シャッフル（sort関数は使用せず、Fisher–Yatesアルゴリズムを使用）
-        for (let i = _answers.length -1; i>0; i--){
-            const rand = Math.floor(Math.random() * (i+1));
+        for (let i = _answers.length - 1; i > 0; i--){
+            const rand = Math.floor(Math.random() * (i + 1));
             [_answers[i], _answers[rand]] = [_answers[rand], _answers[i]]
         }
 
