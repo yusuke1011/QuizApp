@@ -1,24 +1,23 @@
 //--------------------------------
 // ページを更新する関数
-// [引数]なし
+// [引数]クイズインスタンスを格納した配列
 //--------------------------------
-const screenUpdate = () => {
+const screenUpdate = (_quizinstances) => {
+    const quizNum = 10;
     //10問目まで出題されていない場合
-    if(count < 10){
-        let countNum = count + 1;
+    if(count < quizNum){
 
-        //何問目の出題かをクイズインスタンスにセット
-        quiz.setQuizDataIndex = count;
-        console.log(`${countNum}問目のクイズデータをセットしました`);
+        const quizinstance = _quizinstances[count];
+        console.log(`${count + 1}問目のクイズデータをセットしました`);
 
         //文章の更新
         title.innerHTML = `問題${count + 1}`;
-        subTitle.innerText = '[ジャンル] ' + quiz.category + '\n'; 
-        subTitle.innerText += '[難易度] ' + quiz.difficulty;
-        questionMessage.innerHTML = quiz.question;
+        subTitle.innerText = '[ジャンル] ' + quizinstance.category + '\n'; 
+        subTitle.innerText += '[難易度] ' + quizinstance.difficulty;
+        questionMessage.innerHTML = quizinstance.question;
 
         //Answerボタンの作成
-        createAnswerButton(quiz.answers);
+        createAnswerButton(_quizinstances);
 
         count++;
     }
@@ -42,25 +41,26 @@ const screenUpdate = () => {
 
 //--------------------------------
 // 回答の選択肢ボタンを生成する関数
-// [引数]回答の選択肢が格納されている配列
+// [引数]クイズインスタンスを格納した配列
 //--------------------------------
-const createAnswerButton = (_quizAnswers) => {
+const createAnswerButton = (_quizinstances) =>{
+    const quizinstance = _quizinstances[count];
+    const answerElements = document.getElementsByTagName('td');
 
     //配列をコピー
-    const copiedQuizAnswers = _quizAnswers.slice();
+    const copiedQuizAnswers = quizinstance.answers().slice();
 
-    copiedQuizAnswers.forEach((element, num) => {
-        let obj = {}; //生成したボタン格納用オブジェクト
-        obj = document.createElement('button');
-        obj.textContent = element;
-        answers[num].appendChild(obj);
-        obj.addEventListener('click', () => {
+    copiedQuizAnswers.forEach((element, index) => {
+        let buttonElement = document.createElement('button');
+        buttonElement.textContent = element;
+        answerElements[index].appendChild(buttonElement);
+        buttonElement.addEventListener('click', () => {
             //Answerボタンを削除
             deleteAnswerButton(); 
             //ページを更新
-            screenUpdate(); 
+            screenUpdate(_quizinstances); 
             //正答か否かを判定
-            judgeCorrectAnswer(num); 
+            judgeCorrectAnswer(quizinstance, index); 
         });
     });
 };
@@ -70,19 +70,23 @@ const createAnswerButton = (_quizAnswers) => {
 // [引数]なし
 //--------------------------------
 const deleteAnswerButton = () => {
-    answers.forEach((element) => {
-        while(element.firstChild){
-            element.removeChild(element.firstChild);
+    const tabaleElement = document.getElementsByTagName('td');
+    
+    //getElementsByTagName('td')で取得した配列に対してforEachが使用できなかったのでfor分を使用しました。
+    for(let i = 0; i < tabaleElement.length; i++){
+        while(tabaleElement[i].firstChild){
+            tabaleElement[i].removeChild(tabaleElement[i].firstChild);
         }
-    })
-}
+    }
+};
 
 //--------------------------------
 // 何問正答したかを算出する関数
 // [引数]選択した回答選択肢の番号
+//      クイズインスタンス
 //--------------------------------
-const judgeCorrectAnswer = (_num) => {
-    if(quiz.answers[_num] === quiz.correctAnswer){
+const judgeCorrectAnswer = (_quizinstance, _num) => {
+    if(_quizinstance.answers()[_num] === _quizinstance.correctAnswer){
         correctCount++;
     }
 };
