@@ -1,6 +1,6 @@
 //APIから取得したクイズオブジェクトとクイズ番号（0～9）をセットし、
 //カテゴリーや問題文などを取得するクラス
-class QuizClass {
+class Quiz {
     constructor(_quizData){ 
         //初期化処理
         this.category = _quizData.category;

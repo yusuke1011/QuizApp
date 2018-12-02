@@ -2,31 +2,28 @@
 // ページを更新する関数
 // [引数]クイズインスタンスを格納した配列
 //--------------------------------
-const screenUpdate = (_quizinstances) => {
-    const quizNum = 10;
+const screenUpdate = (_quizInstances) => {
     //10問目まで出題されていない場合
-    if(count < quizNum){
+    if(window.count < _quizInstances.length){
 
-        const quizinstance = _quizinstances[count];
-        console.log(`${count + 1}問目のクイズデータをセットしました`);
+        const quizinstance = _quizInstances[window.count];
+        console.log(`${window.count + 1}問目のクイズデータをセットしました`);
 
         //文章の更新
-        title.innerHTML = `問題${count + 1}`;
-        subTitle.innerText = '[ジャンル] ' + quizinstance.category + '\n'; 
-        subTitle.innerText += '[難易度] ' + quizinstance.difficulty;
+        window.title.innerHTML = `問題${window.count + 1}`;
+        window.subTitle.innerText = '[ジャンル] ' + quizinstance.category + '\n'; 
+        window.subTitle.innerText += '[難易度] ' + quizinstance.difficulty;
         questionMessage.innerHTML = quizinstance.question;
 
         //Answerボタンの作成
-        createAnswerButton(_quizinstances);
-
-        count++;
+        createAnswerButton(_quizInstances);
     }
     //10問目の出題が終わった場合
     else{
         //文章の更新
-        title.innerHTML = 'あなたの正答数は' + correctCount + 'です！！';
+        window.title.innerHTML = 'あなたの正答数は' + window.correctCount + 'です！！';
         questionMessage.innerHTML = '再度チャレンジしたい場合は以下をクリック！！';
-        subTitle.innerText = null;
+        window.subTitle.innerText = null;
         
         //returnボタンの生成
         let returnButton = document.createElement('button');
@@ -43,24 +40,27 @@ const screenUpdate = (_quizinstances) => {
 // 回答の選択肢ボタンを生成する関数
 // [引数]クイズインスタンスを格納した配列
 //--------------------------------
-const createAnswerButton = (_quizinstances) =>{
-    const quizinstance = _quizinstances[count];
+const createAnswerButton = (_quizInstances) =>{
+    const quizinstance = _quizInstances[window.count];
     const answerElements = document.getElementsByTagName('td');
 
     //配列をコピー
-    const copiedQuizAnswers = quizinstance.answers().slice();
+    const copiedQuizAnswers = quizinstance.answers();
 
     copiedQuizAnswers.forEach((element, index) => {
         let buttonElement = document.createElement('button');
         buttonElement.textContent = element;
         answerElements[index].appendChild(buttonElement);
-        buttonElement.addEventListener('click', () => {
+        buttonElement.addEventListener('click', (event) => {
+            //クリックされた回数をインクリメント
+            window.count++;
             //Answerボタンを削除
             deleteAnswerButton(); 
             //ページを更新
-            screenUpdate(_quizinstances); 
+            screenUpdate(_quizInstances); 
             //正答か否かを判定
-            judgeCorrectAnswer(quizinstance, index); 
+            selectedAnswer = event.target.textContent;
+            judgeCorrectAnswer(quizinstance, selectedAnswer); 
         });
     });
 };
@@ -82,11 +82,11 @@ const deleteAnswerButton = () => {
 
 //--------------------------------
 // 何問正答したかを算出する関数
-// [引数]選択した回答選択肢の番号
+// [引数]選択した回答の文字列
 //      クイズインスタンス
 //--------------------------------
-const judgeCorrectAnswer = (_quizinstance, _num) => {
-    if(_quizinstance.answers()[_num] === _quizinstance.correctAnswer){
-        correctCount++;
+const judgeCorrectAnswer = (_quizinstance, _selectedAnswer) => {
+    if(_selectedAnswer === _quizinstance.correctAnswer){
+        window.correctCount++;
     }
 };

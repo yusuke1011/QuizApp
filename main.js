@@ -1,16 +1,14 @@
 ((global) => {
-    //DOM
-    const title = document.getElementById('title');   
+    //DOM  
     const questionMessage = document.getElementById('questionMessage');
     const start = document.getElementById('start');
     const bottom = document.getElementById('bottom');
+    global.title = document.getElementById('title'); 
     global.subTitle = document.getElementById('subTitle');
 
     //グローバル変数を宣言、初期化
     global.count = 0; //現在が何問目の出題かをカウント
     global.correctCount = 0; //正答した回数をカウント
-
-    const quizInstances = [];
 
     //文章の初期化
     questionMessage.innerHTML = '以下のボタンをクリック';
@@ -29,11 +27,12 @@
             .then((quizDataObj) => {
                 console.log('Promise Valueを取得しました：', quizDataObj);
 
-                quizDataObj.results.forEach((element) => {
+                const quizInstances = quizDataObj.results.map((element) => {
                     //QuizClassをインスタンス化
-                    const quiz = new QuizClass(element);
-                    quizInstances.push(quiz);
-                })
+                    const quiz = new Quiz(element);
+
+                    return quiz;
+                });
                 //ページを更新
                 screenUpdate(quizInstances);
             })
